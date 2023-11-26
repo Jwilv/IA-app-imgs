@@ -1,3 +1,4 @@
+import { FormField } from "@/components";
 import { useState } from "react"
 
 const CreatePost = () => {
@@ -11,6 +12,18 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handleSubmit = () => {
+
+  }
+
+  const handleChange = () => {
+
+  }
+
+  const handleSurpriseMe = () => {
+
+  }
+
   return (
     <section className="max-w-7xl mx-auto">
       <div>
@@ -21,7 +34,27 @@ const CreatePost = () => {
       </div>
 
       <form className="mt-16 max-w-3xl">
+        <div className="flex flex-col gap-5">
+          <FormField
+            labelName="Your name"
+            type="text"
+            name="name"
+            placeholder="John Doe"
+            value={form.name}
+            handleChange={handleChange}
+          />
 
+          <FormField
+            labelName="Prompt"
+            type="text"
+            name="name"
+            placeholder="a painting of a fox in the style of Starry Night"
+            value={form.prompt}
+            handleChange={handleChange}
+            isSurpriseMe
+            handleSurpriseMe={handleSurpriseMe}
+          />
+        </div>
       </form>
 
     </section >
