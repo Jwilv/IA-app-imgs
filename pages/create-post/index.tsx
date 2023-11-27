@@ -1,7 +1,8 @@
 import { preview } from "@/assets";
 import { FormField, Loader } from "@/components";
+import { getRandomPrompt } from "@/utils";
 import Image from "next/image";
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
 
 const CreatePost = () => {
 
@@ -18,12 +19,19 @@ const CreatePost = () => {
 
   }
 
-  const handleChange = () => {
-
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value
+    })
   }
 
   const handleSurpriseMe = () => {
-
+    const randomPrompt = getRandomPrompt(form.prompt);
+    setForm({
+      ...form,
+      prompt: randomPrompt
+    });
   }
 
   const generateImage = () => {
@@ -103,9 +111,10 @@ const CreatePost = () => {
         <div className="mt-10">
           <p className="mt-2 text-[#666e75] text-[14px]">
             Once you have created the image you want, you can share it with others in the community
-            </p>
+          </p>
           <button
             type="submit"
+            onClick={handleSubmit}
             className="mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {loading ? 'Sharing...' : 'Share with the community'}
