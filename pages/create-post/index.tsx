@@ -34,8 +34,32 @@ const CreatePost = () => {
     });
   }
 
-  const generateImage = () => {
+  const generateImage = async () => {
 
+    if (form.prompt) {
+      setGeneratingImg(true);
+      try {
+
+        const response = await fetch('http://localhost:5050/api/v1/dalle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: form.prompt }),
+        })
+
+        const data = await response.json();
+
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
+
+      } catch (error) {
+        alert(error);
+      } finally {
+        setGeneratingImg(false);
+      }
+    }else{
+      alert('Please provide proper prompt');
+    }
   }
 
   return (
@@ -61,7 +85,7 @@ const CreatePost = () => {
           <FormField
             labelName="Prompt"
             type="text"
-            name="name"
+            name="prompt"
             placeholder="a painting of a fox in the style of Starry Night"
             value={form.prompt}
             handleChange={handleChange}
@@ -78,6 +102,8 @@ const CreatePost = () => {
               <Image
                 src={form.photo}
                 alt={form.prompt}
+                width={400}
+                height={400}
                 className="w-full h-full object-contain"
               />
             ) : (
