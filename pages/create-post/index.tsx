@@ -2,7 +2,8 @@ import { preview } from "@/assets";
 import { FormField, Loader } from "@/components";
 import { getRandomPrompt } from "@/utils";
 import Image from "next/image";
-import { ChangeEvent, useState } from "react"
+import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, useState } from "react"
 
 const CreatePost = () => {
 
@@ -15,7 +16,35 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const router = useRouter();
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+
+    event.preventDefault();
+
+    if (form.photo && form.name) {
+      setLoading(true);
+
+      try {
+        const response = await fetch('http://localhost:5050/api/v1/post', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(form)
+        });
+
+        await response.json();
+        setLoading(false);
+        router.push('/');
+
+      } catch (error) {
+        setLoading(false)
+        alert(error);
+      }
+    }else{
+      alert('Plase enter a promt and generate an image');
+    }
 
   }
 
@@ -57,7 +86,7 @@ const CreatePost = () => {
       } finally {
         setGeneratingImg(false);
       }
-    }else{
+    } else {
       alert('Please provide proper prompt');
     }
   }
@@ -71,7 +100,9 @@ const CreatePost = () => {
         </p>
       </div>
 
-      <form className="mt-16 max-w-3xl">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-16 max-w-3xl">
         <div className="flex flex-col gap-5">
           <FormField
             labelName="Your name"
@@ -140,7 +171,6 @@ const CreatePost = () => {
           </p>
           <button
             type="submit"
-            onClick={handleSubmit}
             className="mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {loading ? 'Sharing...' : 'Share with the community'}
