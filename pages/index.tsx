@@ -1,6 +1,6 @@
 
 import { Loader, Card, FormField } from '@/components'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface PropsRenderCards {
   data: any
@@ -8,7 +8,7 @@ interface PropsRenderCards {
 }
 
 const RenderCards = ({ data, title }: PropsRenderCards) => {
-  
+
   if (data?.length > 0) {
     return data.map((post: any) => <Card key={post._id} {...post} />)
   }
@@ -26,6 +26,32 @@ export default function Home() {
   const [allPosts, setAllPosts] = useState(null);
   const [seacrhText, setSeacrhText] = useState('');
 
+  const refreshPost = async () => {
+    setLoading(true);
+    try {
+      const response: any = await fetch('http://localhost:5050/api/v1/post', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAllPosts(result.data.reverse());
+      }
+
+    } catch (error) {
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    refreshPost();
+  }, [])
+
+
   return (
     <section className='max-w-7xl mx-auto'>
       <div>
@@ -36,7 +62,13 @@ export default function Home() {
       </div>
 
       <div className='mt-16'>
-        <FormField />
+        <FormField
+          placeholder='search pohto'
+          name='search'
+          value={seacrhText}
+          labelName='Search'
+          type='text'
+        />
       </div>
 
       <div className='mt-10'>
@@ -59,7 +91,7 @@ export default function Home() {
                     <RenderCards data={[]} title='No search results found' />
                   )
                     : (
-                      <RenderCards data={[]} title='No posts found' />
+                      <RenderCards data={allPosts} title='No posts found' />
                     )
                 }
               </div>
