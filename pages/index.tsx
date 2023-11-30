@@ -1,6 +1,6 @@
 
 import { Loader, Card, FormField } from '@/components'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 interface PropsRenderCards {
   data: any
@@ -20,11 +20,20 @@ const RenderCards = ({ data, title }: PropsRenderCards) => {
   )
 }
 
+interface Items {
+  name: string
+  prompt: string
+  photo: string
+}
+
 export default function Home() {
 
   const [loading, setLoading] = useState(false);
-  const [allPosts, setAllPosts] = useState(null);
+  const [allPosts, setAllPosts] = useState<null | Items[]>(null);
   const [seacrhText, setSeacrhText] = useState('');
+  const [searchResults, setSearchResults] = useState<Items[] | null>();
+  const [searchTimeout, setSearchTimeout] = useState<any>(null);
+
 
   const refreshPost = async () => {
     setLoading(true);
@@ -51,7 +60,23 @@ export default function Home() {
     refreshPost();
   }, [])
 
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(searchTimeout);
+    setSeacrhText(e.target.value);
 
+    setSearchTimeout(
+      setTimeout(() => {
+        const filterResults = allPosts?.filter((item) =>
+          item.prompt.toLowerCase().includes(seacrhText.toLowerCase())
+          || item.name.toLowerCase().includes(seacrhText.toLowerCase())
+        )
+
+        setSearchResults(filterResults);
+      }, 500)
+    )
+
+
+  }
   return (
     <section className='max-w-7xl mx-auto'>
       <div>
@@ -63,6 +88,7 @@ export default function Home() {
 
       <div className='mt-16'>
         <FormField
+          handleChange={handleSearchChange}
           placeholder='search pohto'
           name='search'
           value={seacrhText}
@@ -88,7 +114,7 @@ export default function Home() {
               <div className='grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3'>
                 {
                   seacrhText ? (
-                    <RenderCards data={[]} title='No search results found' />
+                    <RenderCards data={searchResults} title='No search results found' />
                   )
                     : (
                       <RenderCards data={allPosts} title='No posts found' />
